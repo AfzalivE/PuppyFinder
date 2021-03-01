@@ -7,16 +7,15 @@ import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -41,8 +40,8 @@ fun PuppyDetailContent(animal: Animal) {
         modifier = Modifier.scrollable(
             rememberScrollState(),
             orientation = Orientation.Vertical
-        ),
-        horizontalAlignment = Alignment.CenterHorizontally
+        ).fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Image(
             painter = painterResource(R.drawable.cute_cat),
@@ -55,70 +54,132 @@ fun PuppyDetailContent(animal: Animal) {
 }
 
 @Composable
-private fun DetailsCard(animal: Animal) {
+private fun DetailsCard(
+    animal: Animal
+) {
     val sexIcon = if (animal.sex == Sex.FEMALE) R.drawable.gender_female else R.drawable.gender_male
     val childOrAdult = if (animal.age < 3) "Child" else "Adult"
 
     Card(
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier
-            .offset(y = (-16).dp),
-        elevation = 4.dp
+            .width(320.dp)
+            .offset(y = (-84).dp),
+        elevation = 4.dp,
     ) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(32.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+                ,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Text(text = animal.name)
-                Icon(painter = painterResource(id = sexIcon), contentDescription = "")
-            }
-            Text(text = animal.species)
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.LocationOn,
-                    contentDescription = ""
+                Text(
+                    text = animal.name,
+                    style = MaterialTheme.typography.h6
                 )
-                Text(text = animal.location)
                 Icon(
-                    imageVector = Icons.Default.Refresh,
+                    painter = painterResource(id = sexIcon),
                     contentDescription = "",
-                    modifier = Modifier.padding(start = 4.dp)
+                    tint = Color.Magenta,
+                    modifier = Modifier.height(32.dp)
                 )
-                Text(text = quantityStringResource(id = R.plurals.months, quantity = animal.age, animal.age))
             }
+            Text(
+                text = animal.species,
+                color = LocalContentColor.current.copy(alpha = 0.7f),
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+            IconText(
+                imageVector = Icons.Outlined.LocationOn,
+                contentDescription = Icons.Outlined.LocationOn.name,
+                color = Color(red = 68, green = 138, blue = 254),
+                text = animal.location
+            )
+            IconText(
+                imageVector = Icons.Outlined.Refresh,
+                contentDescription = Icons.Outlined.Refresh.name,
+                color = Color(red = 91, green = 221, blue = 127),
+                text = quantityStringResource(
+                    id = R.plurals.months,
+                    quantity = animal.age,
+                    animal.age
+                ),
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
             Row(
-                horizontalArrangement = Arrangement.Center
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 Text(
-                    modifier = Modifier.background(
-                        color = Color(
-                            red = 253,
-                            green = 218,
-                            blue = 213
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ).padding(8.dp),
-                    text = childOrAdult
+                    modifier = Modifier
+                        .background(
+                            color = Color(
+                                red = 253,
+                                green = 218,
+                                blue = 213
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(vertical = 4.dp, horizontal = 32.dp),
+                    text = childOrAdult,
+                    color = Color(
+                        red = 245,
+                        green = 84,
+                        blue = 105
+                    ),
                 )
                 Text(
-                    modifier = Modifier.background(
-                        color = Color(
-                            red = 225,
-                            green = 241,
-                            blue = 253
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    ).padding(8.dp),
+                    modifier = Modifier
+                        .background(
+                            color = Color(
+                                red = 225,
+                                green = 241,
+                                blue = 253
+                            ),
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(vertical = 4.dp, horizontal = 32.dp),
                     text = animal.sex.name
                         .toLowerCase(Locale.getDefault())
-                        .capitalize(Locale.getDefault())
+                        .capitalize(Locale.getDefault()),
+                    color = Color(
+                        red = 97,
+                        green = 156,
+                        blue = 252
+                    )
                 )
             }
         }
+    }
+}
+
+@Composable
+fun IconText(
+    imageVector: ImageVector,
+    contentDescription: String,
+    color: Color,
+    text: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+    ) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = contentDescription,
+            tint = color,
+            modifier = Modifier.offset(x = (-4).dp)
+        )
+        Text(
+            text = text,
+            color = color,
+            style = MaterialTheme.typography.body2
+        )
     }
 }
 
