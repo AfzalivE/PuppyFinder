@@ -1,4 +1,4 @@
-package com.afzaln.puppyfinder
+package com.example.androiddevchallenge
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.*

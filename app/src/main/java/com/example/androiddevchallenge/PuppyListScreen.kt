@@ -8,15 +8,14 @@ import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -26,9 +25,19 @@ import dev.chrisbanes.accompanist.insets.toPaddingValues
 import dev.chrisbanes.accompanist.picasso.PicassoImage
 
 @Composable
-fun PuppyListScreen(navController: NavController, topAppBarSize: Int) {
+fun PuppyListScreen(navController: NavController) {
+    var topAppBarSize by remember { mutableStateOf(0) }
+
     val puppyList = DogsApi.fetchDogs()
     PuppyListContent(navController, puppyList, topAppBarSize)
+
+    InsetAwareTopAppBar(
+        title = { Text(stringResource(R.string.title)) },
+        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.9f),
+        modifier = Modifier
+            .fillMaxWidth()
+            .onSizeChanged { topAppBarSize = it.height }
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -71,6 +80,11 @@ fun PuppyItem(puppy: Animal, onClick: () -> Unit) {
                 contentDescription = "Photo of ${puppy.name}",
                 fadeIn = true,
                 contentScale = ContentScale.FillHeight,
+                loading = {
+                    Box(Modifier.matchParentSize()) {
+                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                    }
+                },
                 modifier = Modifier.height(240.dp)
             )
             Column(

@@ -1,12 +1,12 @@
 package com.example.androiddevchallenge
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.LocationOn
@@ -17,35 +17,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import dev.chrisbanes.accompanist.insets.statusBarsHeight
 import dev.chrisbanes.accompanist.picasso.PicassoImage
 
 @Composable
-fun PuppyDetailScreen(navController: NavHostController, puppyId: Long = 0L) {
+fun PuppyDetailScreen(puppyId: Long = 0L) {
     val puppy = DogsApi.fetchDog(puppyId)
     PuppyDetailContent(puppy)
+    Spacer(
+        modifier = Modifier
+            .fillMaxWidth()
+            .statusBarsHeight()
+            .background(MaterialTheme.colors.background.copy(alpha = 0.4f))
+    )
 }
 
 @Composable
-fun PuppyDetailContent(animal: Animal) {
+fun PuppyDetailContent(animal: Animal, topAppBarSize: Int = 0) {
     Column(
         modifier = Modifier
             .scrollable(
                 rememberScrollState(),
                 orientation = Orientation.Vertical
             )
-            .fillMaxHeight(),
+            .fillMaxHeight()
+            .padding(top = with(LocalDensity.current) { topAppBarSize.toDp() })
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         PicassoImage(
             data = animal.photo,
             contentDescription = "Photo of ${animal.name}",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.fillMaxWidth()
+            contentScale = ContentScale.FillWidth,
+            loading = {
+                Box(Modifier.matchParentSize()) {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
+            },
+            fadeIn = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(max = 320.dp)
         )
         DetailsCard(animal)
     }
@@ -70,7 +87,7 @@ private fun DetailsCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                    .padding(bottom = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
