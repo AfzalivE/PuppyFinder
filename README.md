@@ -5,7 +5,9 @@
 
 ## :scroll: Description
 Find your next best friend!
+
 The data is from the [Toronto Humane Society](https://www.torontohumanesociety.com/)
+
 The design was adopted from [Michellesetiyanti's Dribbble](https://dribbble.com/shots/15045929-Pet-Adoption-1)
 
 
