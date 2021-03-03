@@ -10,6 +10,7 @@
       the License.
       -->
     <string name="app_name">AndroidDevChallenge</string>
+    <string name="title">Find your next best friend</string>
     <plurals name="months">
         <item quantity="one">%d month</item>
         <item quantity="other">%d months</item>

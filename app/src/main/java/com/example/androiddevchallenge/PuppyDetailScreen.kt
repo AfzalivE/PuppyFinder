@@ -18,36 +18,34 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import java.util.*
+import androidx.navigation.NavHostController
+import dev.chrisbanes.accompanist.picasso.PicassoImage
 
 @Composable
-fun PuppyDetailScreen() {
-    PuppyDetailContent(
-        animal = Animal(
-            name = "Emily",
-            species = "Munchkin Species",
-            location = "Pontianak, Indonesia",
-            age = 3,
-            sex = Sex.FEMALE
-        )
-    )
+fun PuppyDetailScreen(navController: NavHostController, puppyId: Long = 0L) {
+    val puppy = DogsApi.fetchDog(puppyId)
+    PuppyDetailContent(puppy)
 }
 
 @Composable
 fun PuppyDetailContent(animal: Animal) {
     Column(
-        modifier = Modifier.scrollable(
-            rememberScrollState(),
-            orientation = Orientation.Vertical
-        ).fillMaxHeight(),
+        modifier = Modifier
+            .scrollable(
+                rememberScrollState(),
+                orientation = Orientation.Vertical
+            )
+            .fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Image(
-            painter = painterResource(R.drawable.cute_cat),
-            contentDescription = "${animal.name} photo",
-            contentScale = ContentScale.FillWidth,
-            modifier = Modifier.height(320.dp)
+        PicassoImage(
+            data = animal.photo,
+            contentDescription = "Photo of ${animal.name}",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxWidth()
         )
         DetailsCard(animal)
     }
@@ -57,8 +55,7 @@ fun PuppyDetailContent(animal: Animal) {
 private fun DetailsCard(
     animal: Animal
 ) {
-    val sexIcon = if (animal.sex == Sex.FEMALE) R.drawable.gender_female else R.drawable.gender_male
-    val childOrAdult = if (animal.age < 3) "Child" else "Adult"
+    val sexIcon = if (animal.sex == Sex.Female) R.drawable.gender_female else R.drawable.gender_male
 
     Card(
         shape = RoundedCornerShape(16.dp),
@@ -73,8 +70,7 @@ private fun DetailsCard(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 16.dp)
-                ,
+                    .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
@@ -90,8 +86,7 @@ private fun DetailsCard(
             }
             Text(
                 text = animal.species,
-                color = LocalContentColor.current.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.body2.copy(LocalContentColor.current.copy(alpha = 0.7f)),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
             IconText(
@@ -111,51 +106,58 @@ private fun DetailsCard(
                 ),
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-            ) {
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = Color(
-                                red = 253,
-                                green = 218,
-                                blue = 213
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(vertical = 4.dp, horizontal = 32.dp),
-                    text = childOrAdult,
-                    color = Color(
-                        red = 245,
-                        green = 84,
-                        blue = 105
-                    ),
-                )
-                Text(
-                    modifier = Modifier
-                        .background(
-                            color = Color(
-                                red = 225,
-                                green = 241,
-                                blue = 253
-                            ),
-                            shape = RoundedCornerShape(8.dp)
-                        )
-                        .padding(vertical = 4.dp, horizontal = 32.dp),
-                    text = animal.sex.name
-                        .toLowerCase(Locale.getDefault())
-                        .capitalize(Locale.getDefault()),
-                    color = Color(
-                        red = 97,
-                        green = 156,
-                        blue = 252
-                    )
-                )
-            }
+            AgeSexRow(animal.age, animal.sex.name)
         }
     }
+}
+
+@Composable
+fun AgeSexRow(
+    age: Int,
+    sex: String,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = MaterialTheme.typography.body1.fontSize,
+    horizontalArrangement: Arrangement.HorizontalOrVertical = Arrangement.SpaceEvenly
+) {
+    val childOrAdult = if (age < 3) "Child" else "Adult"
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = horizontalArrangement,
+    ) {
+        TextBox(
+            text = childOrAdult,
+            textColor = Color(red = 245, green = 84, blue = 105),
+            backgroundColor = Color(red = 253, green = 218, blue = 213),
+            style = MaterialTheme.typography.body1.copy(fontSize = fontSize)
+        )
+        TextBox(
+            text = sex,
+            textColor = Color(red = 97, green = 156, blue = 252),
+            backgroundColor = Color(red = 225, green = 241, blue = 253),
+            style = MaterialTheme.typography.body1.copy(fontSize = fontSize)
+        )
+    }
+}
+
+@Composable
+private fun TextBox(
+    text: String,
+    textColor: Color,
+    backgroundColor: Color,
+    style: TextStyle = MaterialTheme.typography.body1
+) {
+    Text(
+        modifier = Modifier
+            .background(
+                color = backgroundColor,
+                shape = RoundedCornerShape(8.dp)
+            )
+            .padding(vertical = 4.dp, horizontal = 16.dp),
+        text = text,
+        color = textColor,
+        style = style
+    )
 }
 
 @Composable
@@ -181,16 +183,4 @@ fun IconText(
             style = MaterialTheme.typography.body2
         )
     }
-}
-
-data class Animal(
-    val name: String,
-    val species: String,
-    val location: String,
-    val age: Int,
-    val sex: Sex
-)
-
-enum class Sex {
-    MALE, FEMALE
 }
